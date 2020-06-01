@@ -14,12 +14,18 @@ let users = [
 
 // GET requests
 server.get('/api/users', (req, res) => {
+  
   res.status(200).json(users)
 })
 
 // POST requests
 server.post('/api/users', (req, res) => {
   const user = req.body;
+
+  if (user.name === null || user.bio === null) {
+    res.status(400)
+    res.send({ errorMessage: "Please provide name and bio for the user." })
+  }
 
   users.push(user)
 
@@ -33,6 +39,20 @@ server.delete('/api/users/:id', (req, res) => {
   users = users.filter(user => user.id !== Number(id))
 
   res.status(201).json(users)
+})
+
+// PUT requests
+server.put('/api/users/:id', (req, res) => {
+  const updateUser = req.body;
+
+  updateUser(req.params.id, updateUser);
+
+  res.send({message: 'User updated.'})
+})
+
+// 404 error code
+server.use('/api/users/:id', (req, res) => {
+  res.status(404).send({ message: "The user with the specified ID does not exist." })
 })
 
 // listen for incoming requests
