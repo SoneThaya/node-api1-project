@@ -34,7 +34,7 @@ server.get('/api/users/:id', (req, res) => {
   const id = req.params.id
   const user = users.find(user => user.id === Number(id))
 
-  if (user) {
+  if (!user) {
     res.status(404).send({ message: "The user with the specified ID does not exist." })
   } else {
     try {
