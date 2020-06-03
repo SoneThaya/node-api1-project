@@ -78,20 +78,35 @@ server.delete('/api/users/:id', (req, res) => {
 
 // PUT requests
 server.put('/api/users/:id', (req, res) => {
-  const id = req.params.id
-  const user = users.find(user => user.id === Number(id))
+  const id = Number(req.params.id)
+  
+  const user = users.find(user => user.id === id)
 
   if (!user) {
-    res.status(404).send({message: "The user with the specified ID does not exist."})
+    res.status(404).send({ message: "The user with the specified ID does not exist." })
   } else if (!user.name || !user.bio) {
-    res.status(400).send({errorMessage: "Please provide name and bio for the user."})
-  } else if (user) {
-    users.push(user)
-    res.status(200)
-    res.send({message: 'User updated.'})
-  } else  {
-    res.status(500)
+    res.status(400).send({ errorMessage: "Please provide name and bio for the user." })
+  } else {
+    try {
+      const updated = users.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            name: req.body.name,
+            bio: req.body.bio
+          }
+        } else {
+          return item
+        }
+      })
+      users = updated
+      res.status(200).json(users)
+    }
+    catch (error) {
+      console.log(error)
+      res.status(500)
         .json({ errorMessage: "The user information could not be modified." })
+    }
   }
 })
 
